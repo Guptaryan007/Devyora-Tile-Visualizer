@@ -1,8 +1,35 @@
 import { useNavigate } from 'react-router-dom'
+import { useFlow } from '../state/FlowContext'
 import './Summary.css'
+
+const TILE_SIZE_LABELS: Record<string, string> = {
+  '600x600': '600 × 600 mm',
+  '800x800': '800 × 800 mm',
+  '1200x600': '1200 × 600 mm',
+  '1200x1200': '1200 × 1200 mm',
+}
+
+const STYLE_LABELS: Record<string, string> = {
+  minimal: 'Minimal',
+  modern: 'Modern',
+  luxury: 'Luxury',
+  warm: 'Warm',
+  contemporary: 'Contemporary',
+  earthy: 'Earthy',
+  indian: 'Indian',
+  elegant: 'Elegant',
+  surprise: 'Surprise Me',
+}
+
+const NOT_SELECTED = 'Not selected'
 
 function Summary() {
   const navigate = useNavigate()
+  const { croppedImage, tileSize, space, style } = useFlow()
+  const tileSizeLabel = tileSize ? TILE_SIZE_LABELS[tileSize] ?? tileSize : NOT_SELECTED
+  const spaceLabel = space ?? NOT_SELECTED
+  const styleLabel = style ? STYLE_LABELS[style] ?? style : NOT_SELECTED
+  const missingClass = 'text-on-surface-variant'
   const handleReturn = () => {
     navigate('/style')
   }
@@ -81,11 +108,17 @@ function Summary() {
               {/* Tile Texture Showcase with Bronze Framing Ambient */}
               <div className="relative w-full aspect-[16/10] bg-surface-container-lowest overflow-hidden">
                 {/* Physical Tile Reference Image */}
-                <img
-                  alt="Top-down close-up photographic shot of a real luxury architectural porcelain slab tile, travertine cream marble with delicate warm beige veins and subtle tactile matte honed texture, architectural material showroom sample"
-                  className="w-full h-full object-cover"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDO9Sw_P-OLg87i2fEL8bhqb8bY9LFOd8fpZLTLgsoNtXVRfm4NFxWPp5kgtuBAq_3oWjY-p9xi5--YUo1YRWwX8h9JbDuKMofZI84duIuJfsosmMt4mZEjXhis9pAeFbvoarHs3sctbv9E-YilGGMdjHJVn47bq9zisvF5og0lnYdS3vFJ9cVcicux8PaxpbdreYFD8zBNR3uQ_My1Ke46aBZ9BTwLWTm5VzOau3JhRtLoE-M0gHoRsQ"
-                />
+                {croppedImage ? (
+                  <img
+                    alt="Cropped physical tile reference"
+                    className="w-full h-full object-cover"
+                    src={croppedImage}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-surface-container-lowest">
+                    <span className="font-title-md text-title-md text-on-surface-variant">{NOT_SELECTED}</span>
+                  </div>
+                )}
                 {/* Subtle Vignette & Framing Glow */}
                 <div className="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-surface-container-lowest/30 pointer-events-none"></div>
                 {/* Floating Badge for Material Authentication */}
@@ -127,7 +160,7 @@ function Summary() {
                       </div>
                       <div className="flex flex-col">
                         <span className="font-label-caps text-label-caps uppercase text-outline">Tile Size</span>
-                        <span className="font-spec-numeral text-spec-numeral text-on-surface">1200 × 600 mm</span>
+                        <span className={`font-spec-numeral text-spec-numeral ${tileSize ? 'text-on-surface' : missingClass}`}>{tileSizeLabel}</span>
                       </div>
                     </div>
                     <button aria-label="Edit Tile Size" className="p-2 text-on-surface-variant hover:text-primary transition-colors" type="button" onClick={handleEditSize}>
@@ -142,7 +175,7 @@ function Summary() {
                       </div>
                       <div className="flex flex-col">
                         <span className="font-label-caps text-label-caps uppercase text-outline">Selected Space</span>
-                        <span className="font-title-md text-title-md text-on-surface">Bathroom Suite</span>
+                        <span className={`font-title-md text-title-md ${space ? 'text-on-surface' : missingClass}`}>{spaceLabel}</span>
                       </div>
                     </div>
                     <button aria-label="Edit Space" className="p-2 text-on-surface-variant hover:text-primary transition-colors" type="button" onClick={handleEditSpace}>
@@ -157,7 +190,7 @@ function Summary() {
                       </div>
                       <div className="flex flex-col">
                         <span className="font-label-caps text-label-caps uppercase text-outline">Design Style</span>
-                        <span className="font-title-md text-title-md text-on-surface">Minimal Architectural</span>
+                        <span className={`font-title-md text-title-md ${style ? 'text-on-surface' : missingClass}`}>{styleLabel}</span>
                       </div>
                     </div>
                     <button aria-label="Edit Style" className="p-2 text-on-surface-variant hover:text-primary transition-colors" type="button" onClick={handleEditStyle}>
