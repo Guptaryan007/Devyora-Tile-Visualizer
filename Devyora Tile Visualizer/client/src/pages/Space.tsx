@@ -1,9 +1,15 @@
+import { useNavigate } from 'react-router-dom'
 import './Space.css'
 
 function Space() {
-  const handleReturn = () => {}
+  const navigate = useNavigate()
+  const handleReturn = () => {
+    navigate('/tile-size')
+  }
   const handleSelectSpace = () => {}
-  const handleContinue = () => {}
+  const handleContinue = () => {
+    navigate('/style')
+  }
 
   return (
     <div className="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen">

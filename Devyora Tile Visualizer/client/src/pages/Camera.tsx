@@ -1,11 +1,21 @@
+import { useNavigate } from 'react-router-dom'
 import './Camera.css'
 
 function Camera() {
-  const handleReturn = () => {}
-  const handlePreviousStep = () => {}
+  const navigate = useNavigate()
+  const handleReturn = () => {
+    navigate('/')
+  }
+  const handlePreviousStep = () => {
+    navigate('/')
+  }
   const handleToggleGrid = () => {}
-  const handleCapture = () => {}
-  const handleUploadFromGallery = () => {}
+  const handleCapture = () => {
+    navigate('/crop')
+  }
+  const handleUploadFromGallery = () => {
+    navigate('/crop')
+  }
 
   return (
     <div className="camera-page bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen">

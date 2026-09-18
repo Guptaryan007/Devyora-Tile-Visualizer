@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import './Home.css'
 
 const LOGO_SRC =
@@ -7,8 +8,11 @@ const TILE_SRC =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuDO9Sw_P-OLg87i2fEL8bhqb8bY9LFOd8fpZLTLgsoNtXVRfm4NFxWPp5kgtuBAq_3oWjY-p9xi5--YUo1YRWwX8h9JbDuKMofZI84duIuJfsosmMt4mZEjXhis9pAeFbvoarHs3sctbv9E-YilGGMdjHJVn47bq9zisvF5og0lnYdS3vFJ9cVcicux8PaxpbdreYFD8zBNR3uQ_My1Ke46aBZ9BTwLWTm5VzOau3JhRtLoE-M0gHoRsQ'
 
 function Home() {
+  const navigate = useNavigate()
   const handleThemeToggle = () => {}
-  const handleStart = () => {}
+  const handleStart = () => {
+    navigate('/camera')
+  }
 
   return (
     <main className="home">

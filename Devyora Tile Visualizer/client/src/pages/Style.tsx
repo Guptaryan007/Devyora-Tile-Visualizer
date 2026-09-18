@@ -1,8 +1,15 @@
+import { useNavigate } from 'react-router-dom'
 import './Style.css'
 
 function Style() {
-  const handleReturn = () => {}
+  const navigate = useNavigate()
+  const handleReturn = () => {
+    navigate('/space')
+  }
   const handleSelectStyle = () => {}
+  const handleReview = () => {
+    navigate('/summary')
+  }
 
   return (
     <div className="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen">
@@ -295,6 +302,7 @@ function Style() {
                 className="w-full h-14 bg-primary text-on-primary font-title-md text-title-md uppercase tracking-wider rounded flex items-center justify-center gap-space-sm shadow-[0_4px_20px_rgba(197,168,128,0.22)] active:scale-[0.99] transition-transform"
                 id="review-generate-btn"
                 type="button"
+                onClick={handleReview}
               >
                 <span>Review & Generate</span>
                 <span className="material-symbols-outlined text-[20px]">arrow_forward</span>

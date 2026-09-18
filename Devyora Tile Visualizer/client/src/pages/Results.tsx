@@ -1,12 +1,20 @@
+import { useNavigate } from 'react-router-dom'
 import './Results.css'
 
 function Results() {
-  const handleReturn = () => {}
+  const navigate = useNavigate()
+  const handleReturn = () => {
+    navigate('/summary')
+  }
   const handleShare = () => {}
   const handleExport = () => {}
   const handlePin = () => {}
-  const handleRegenerate = () => {}
-  const handleStartNew = () => {}
+  const handleRegenerate = () => {
+    navigate('/loading')
+  }
+  const handleStartNew = () => {
+    navigate('/')
+  }
   const handleDownload = () => {}
 
   return (

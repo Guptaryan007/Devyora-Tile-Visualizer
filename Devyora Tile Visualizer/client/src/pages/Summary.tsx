@@ -1,8 +1,29 @@
+import { useNavigate } from 'react-router-dom'
 import './Summary.css'
 
 function Summary() {
-  const handleReturn = () => {}
-  const handleGenerate = () => {}
+  const navigate = useNavigate()
+  const handleReturn = () => {
+    navigate('/style')
+  }
+  const handleGenerate = () => {
+    navigate('/loading')
+  }
+  const handleRecrop = () => {
+    navigate('/crop')
+  }
+  const handleEditProfile = () => {
+    navigate('/camera')
+  }
+  const handleEditSize = () => {
+    navigate('/tile-size')
+  }
+  const handleEditSpace = () => {
+    navigate('/space')
+  }
+  const handleEditStyle = () => {
+    navigate('/style')
+  }
 
   return (
     <div className="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen">
@@ -78,7 +99,7 @@ function Summary() {
                   <span className="font-label-caps text-label-caps uppercase tracking-wider text-on-surface">Physical Scan Captured</span>
                 </div>
                 {/* Recalibrate Trigger */}
-                <button aria-label="Re-crop Tile" className="absolute top-3 right-3 bg-surface-container-lowest/90 backdrop-blur-md text-on-surface hover:text-primary px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md transition-colors" type="button">
+                <button aria-label="Re-crop Tile" className="absolute top-3 right-3 bg-surface-container-lowest/90 backdrop-blur-md text-on-surface hover:text-primary px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md transition-colors" type="button" onClick={handleRecrop}>
                   <span className="material-symbols-outlined text-[14px]">crop</span>
                   <span className="font-label-caps text-label-caps uppercase">Crop</span>
                 </button>
@@ -97,7 +118,7 @@ function Summary() {
                     <h2 className="font-title-md text-title-md text-on-surface">Physical Tile Reference (Travertine Honed)</h2>
                     <span className="font-body-sm text-body-sm text-secondary-fixed-dim">Sintered Porcelain Slabs • Italy</span>
                   </div>
-                  <button aria-label="Edit Tile Profile" className="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center text-primary hover:bg-surface-bright transition-colors" type="button">
+                  <button aria-label="Edit Tile Profile" className="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center text-primary hover:bg-surface-bright transition-colors" type="button" onClick={handleEditProfile}>
                     <span className="material-symbols-outlined text-[18px]">edit</span>
                   </button>
                 </div>
@@ -114,7 +135,7 @@ function Summary() {
                         <span className="font-spec-numeral text-spec-numeral text-on-surface">1200 × 600 mm</span>
                       </div>
                     </div>
-                    <button aria-label="Edit Tile Size" className="p-2 text-on-surface-variant hover:text-primary transition-colors" type="button">
+                    <button aria-label="Edit Tile Size" className="p-2 text-on-surface-variant hover:text-primary transition-colors" type="button" onClick={handleEditSize}>
                       <span className="material-symbols-outlined text-[18px]">tune</span>
                     </button>
                   </div>
@@ -129,7 +150,7 @@ function Summary() {
                         <span className="font-title-md text-title-md text-on-surface">Bathroom Suite</span>
                       </div>
                     </div>
-                    <button aria-label="Edit Space" className="p-2 text-on-surface-variant hover:text-primary transition-colors" type="button">
+                    <button aria-label="Edit Space" className="p-2 text-on-surface-variant hover:text-primary transition-colors" type="button" onClick={handleEditSpace}>
                       <span className="material-symbols-outlined text-[18px]">tune</span>
                     </button>
                   </div>
@@ -144,7 +165,7 @@ function Summary() {
                         <span className="font-title-md text-title-md text-on-surface">Minimal Architectural</span>
                       </div>
                     </div>
-                    <button aria-label="Edit Style" className="p-2 text-on-surface-variant hover:text-primary transition-colors" type="button">
+                    <button aria-label="Edit Style" className="p-2 text-on-surface-variant hover:text-primary transition-colors" type="button" onClick={handleEditStyle}>
                       <span className="material-symbols-outlined text-[18px]">tune</span>
                     </button>
                   </div>

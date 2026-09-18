@@ -1,9 +1,18 @@
+import { useNavigate } from 'react-router-dom'
 import './TileSize.css'
 
 function TileSize() {
-  const handleReturn = () => {}
-  const handleBack = () => {}
+  const navigate = useNavigate()
+  const handleReturn = () => {
+    navigate('/crop')
+  }
+  const handleBack = () => {
+    navigate('/crop')
+  }
   const handleSelectSize = () => {}
+  const handleContinue = () => {
+    navigate('/space')
+  }
 
   return (
     <div className="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen">
@@ -234,6 +243,7 @@ function TileSize() {
                 className="w-full h-[52px] bg-primary text-on-primary hover:bg-primary-fixed-dim active:scale-[0.99] rounded-lg font-title-md text-title-md tracking-wider uppercase flex items-center justify-center gap-space-xs transition-all shadow-[0_8px_24px_rgba(197,168,128,0.22)]"
                 id="continue-btn"
                 type="button"
+                onClick={handleContinue}
               >
                 <span>Continue</span>
                 <span className="material-symbols-outlined text-[20px]">east</span>

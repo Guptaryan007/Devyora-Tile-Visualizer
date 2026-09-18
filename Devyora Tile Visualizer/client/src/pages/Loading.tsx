@@ -1,7 +1,19 @@
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './Loading.css'
 
 function Loading() {
-  const handleReturn = () => {}
+  const navigate = useNavigate()
+  const handleReturn = () => {
+    navigate('/summary')
+  }
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      navigate('/results')
+    }, 2400)
+    return () => window.clearTimeout(timer)
+  }, [navigate])
 
   return (
     <div className="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen">

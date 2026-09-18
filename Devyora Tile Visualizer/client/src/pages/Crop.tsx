@@ -1,12 +1,191 @@
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type DragEvent, type PointerEvent } from 'react'
+import Cropper, { type Area } from 'react-easy-crop'
+import { useNavigate } from 'react-router-dom'
+import { useFlow } from '../state/FlowContext'
+import { getCroppedImage } from '../utils/cropImage'
 import './Crop.css'
 
+const SAMPLE_TILE_IMAGE = '/sample-tile.jpg'
+const MIN_CROP_EDGE = 96
+
+type CropCorner = 'nw' | 'ne' | 'sw' | 'se'
+
+function defaultCropEdge(frameSize: number) {
+  return Math.round(Math.max(MIN_CROP_EDGE, frameSize * 0.76))
+}
+
 function Crop() {
-  const handleReturn = () => {}
-  const handleZoom = () => {}
-  const handleRotate = () => {}
-  const handleStraighten = () => {}
-  const handleResetCrop = () => {}
-  const handleConfirmCrop = () => {}
+  const navigate = useNavigate()
+  const { tileImage, setCroppedImage } = useFlow()
+  const imageSrc = tileImage ?? SAMPLE_TILE_IMAGE
+  const canvasRef = useRef<HTMLDivElement>(null)
+  const resizeRef = useRef<{
+    corner: CropCorner
+    startX: number
+    startY: number
+    startEdge: number
+  } | null>(null)
+  const htmlDragRef = useRef(false)
+  const applyResizeDeltaRef = useRef<(clientX: number, clientY: number) => void>(() => {})
+
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [rotation90, setRotation90] = useState(0)
+  const [yaw, setYaw] = useState(0)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
+  const [confirming, setConfirming] = useState(false)
+  const [frameSize, setFrameSize] = useState(0)
+  const [cropEdge, setCropEdge] = useState<number | null>(null)
+
+  const rotation = rotation90 + yaw
+  const cropInset = frameSize && cropEdge ? (frameSize - cropEdge) / 2 : 24
+
+  useLayoutEffect(() => {
+    const el = canvasRef.current
+    if (!el) return
+
+    const apply = () => {
+      const size = Math.round(el.getBoundingClientRect().width)
+      setFrameSize(size)
+      setCropEdge((current) => {
+        const max = Math.max(MIN_CROP_EDGE, size - 16)
+        if (current == null) return Math.min(defaultCropEdge(size), max)
+        return Math.min(current, max)
+      })
+    }
+
+    apply()
+    const observer = new ResizeObserver(apply)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const onMove = (event: globalThis.PointerEvent) => {
+      applyResizeDeltaRef.current(event.clientX, event.clientY)
+    }
+    const onUp = () => {
+      if (htmlDragRef.current) return
+      resizeRef.current = null
+    }
+    const onDragOver = (event: globalThis.DragEvent) => {
+      if (!resizeRef.current) return
+      event.preventDefault()
+      applyResizeDeltaRef.current(event.clientX, event.clientY)
+    }
+    const onDragEnd = () => {
+      htmlDragRef.current = false
+      resizeRef.current = null
+    }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+    window.addEventListener('pointercancel', onUp)
+    window.addEventListener('dragover', onDragOver)
+    window.addEventListener('dragend', onDragEnd)
+    return () => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+      window.removeEventListener('pointercancel', onUp)
+      window.removeEventListener('dragover', onDragOver)
+      window.removeEventListener('dragend', onDragEnd)
+    }
+  }, [])
+
+  const onCropComplete = useCallback((_croppedArea: Area, pixels: Area) => {
+    setCroppedAreaPixels(pixels)
+  }, [])
+
+  const handleReturn = () => {
+    navigate('/camera')
+  }
+
+  const handleZoom = () => {
+    setZoom((current) => {
+      const next = Number((current + 0.2).toFixed(1))
+      return next > 3 ? 1 : next
+    })
+  }
+
+  const handleRotate = () => {
+    setRotation90((current) => (current + 90) % 360)
+  }
+
+  const handleStraighten = () => {
+    setYaw(0)
+  }
+
+  const handleResetCrop = () => {
+    setCrop({ x: 0, y: 0 })
+    setZoom(1)
+    setRotation90(0)
+    setYaw(0)
+    if (frameSize) setCropEdge(defaultCropEdge(frameSize))
+  }
+
+  const applyResizeDelta = (clientX: number, clientY: number) => {
+    if (!resizeRef.current) return
+    if (clientX === 0 && clientY === 0) return
+    const { corner, startX, startY, startEdge } = resizeRef.current
+    const dx = clientX - startX
+    const dy = clientY - startY
+    let delta = 0
+    if (corner === 'se') delta = (dx + dy) / 2
+    if (corner === 'nw') delta = -(dx + dy) / 2
+    if (corner === 'ne') delta = (-dx + dy) / 2
+    if (corner === 'sw') delta = (dx - dy) / 2
+    const max = Math.max(MIN_CROP_EDGE, frameSize - 16)
+    setCropEdge(Math.min(max, Math.max(MIN_CROP_EDGE, startEdge + delta * 2)))
+  }
+  applyResizeDeltaRef.current = applyResizeDelta
+
+  const onHandlePointerDown = (corner: CropCorner) => (event: PointerEvent<HTMLSpanElement>) => {
+    event.stopPropagation()
+    if (cropEdge == null) return
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId)
+    } catch {
+      // Synthetic or unsupported pointer capture should not block resizing.
+    }
+    resizeRef.current = {
+      corner,
+      startX: event.clientX,
+      startY: event.clientY,
+      startEdge: cropEdge,
+    }
+  }
+
+  const onHandleDragStart = (corner: CropCorner) => (event: DragEvent<HTMLSpanElement>) => {
+    event.dataTransfer.setData('text/plain', 'crop-resize')
+    event.dataTransfer.effectAllowed = 'move'
+    const dragPreview = new Image()
+    dragPreview.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+    event.dataTransfer.setDragImage(dragPreview, 0, 0)
+    htmlDragRef.current = true
+    if (cropEdge == null) return
+    resizeRef.current = {
+      corner,
+      startX: event.clientX,
+      startY: event.clientY,
+      startEdge: cropEdge,
+    }
+  }
+
+  const onHandleDrag = (event: DragEvent<HTMLSpanElement>) => {
+    applyResizeDelta(event.clientX, event.clientY)
+  }
+
+  const handleConfirmCrop = async () => {
+    if (!croppedAreaPixels || confirming) return
+    setConfirming(true)
+    try {
+      const dataUrl = await getCroppedImage(imageSrc, croppedAreaPixels, rotation)
+      setCroppedImage(dataUrl)
+      navigate('/tile-size')
+    } catch (error) {
+      console.error('Failed to crop tile image', error)
+      setConfirming(false)
+    }
+  }
 
   return (
     <div className="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen">
@@ -76,7 +255,7 @@ function Crop() {
               >
                 <span className="material-symbols-outlined text-[16px] text-primary">zoom_in</span>
                 <span className="font-body-sm text-body-sm text-on-surface" id="zoomLabel">
-                  1.0x
+                  {zoom.toFixed(1)}x
                 </span>
               </button>
               {/* Rotate 90 deg */}
@@ -111,74 +290,73 @@ function Crop() {
           {/* Central Interactive Cropping Viewport */}
           <div className="px-margin flex flex-col items-center">
             <div
+              ref={canvasRef}
               className="relative w-full aspect-square max-w-[420px] bg-surface-container-lowest rounded-xl overflow-hidden shadow-2xl touch-none select-none"
               id="cropCanvas"
             >
-              {/* Captured Tile Photograph Target */}
-              <div
-                className="absolute inset-0 w-full h-full flex items-center justify-center transition-transform duration-300 ease-out origin-center"
-                id="tileImageWrapper"
-              >
-                <img
-                  alt="Luxury architectural porcelain slab tile sample"
-                  className="w-full h-full object-cover pointer-events-none filter contrast-[1.02] brightness-95"
-                  id="tileImg"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDO9Sw_P-OLg87i2fEL8bhqb8bY9LFOd8fpZLTLgsoNtXVRfm4NFxWPp5kgtuBAq_3oWjY-p9xi5--YUo1YRWwX8h9JbDuKMofZI84duIuJfsosmMt4mZEjXhis9pAeFbvoarHs3sctbv9E-YilGGMdjHJVn47bq9zisvF5og0lnYdS3vFJ9cVcicux8PaxpbdreYFD8zBNR3uQ_My1Ke46aBZ9BTwLWTm5VzOau3JhRtLoE-M0gHoRsQ"
+              {cropEdge != null && (
+                <Cropper
+                  image={imageSrc}
+                  crop={crop}
+                  zoom={zoom}
+                  rotation={rotation}
+                  aspect={1}
+                  cropShape="rect"
+                  showGrid={false}
+                  minZoom={1}
+                  maxZoom={3}
+                  cropSize={{ width: cropEdge, height: cropEdge }}
+                  objectFit="cover"
+                  onCropChange={setCrop}
+                  onCropComplete={onCropComplete}
+                  onZoomChange={setZoom}
+                  classes={{
+                    containerClassName: 'dt-cropper',
+                    mediaClassName: 'dt-crop-media',
+                    cropAreaClassName: 'dt-crop-area',
+                  }}
                 />
-              </div>
-              {/* Scrim Vignette Overlay (Darkens non-cropped zone subtly) */}
-              <div className="absolute inset-0 bg-surface-container-lowest/60 pointer-events-none"></div>
-              {/* Active Precision Crop Box */}
-              <div
-                className="absolute inset-6 shadow-[0_0_0_9999px_rgba(18,19,20,0.55)] cursor-move pointer-events-auto transition-all duration-75"
-                id="cropBox"
-              >
-                {/* Rule-of-Thirds Grid Lines (Architectural Reticle) */}
-                <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 pointer-events-none">
-                  <div className="bg-primary/10"></div>
-                  <div className="bg-transparent"></div>
-                  <div className="bg-primary/10"></div>
-                  <div className="bg-transparent"></div>
-                  <div className="bg-primary/15 flex items-center justify-center">
-                    {/* Reticle Crosshair Indicator */}
-                    <div className="w-2 h-2 rounded-full bg-primary/40"></div>
-                  </div>
-                  <div className="bg-transparent"></div>
-                  <div className="bg-primary/10"></div>
-                  <div className="bg-transparent"></div>
-                  <div className="bg-primary/10"></div>
-                </div>
-                {/* Solid Bronze Architectural Corner Handles (Upper Left) */}
-                <div className="absolute -top-1.5 -left-1.5 w-5 h-5 flex flex-col justify-between pointer-events-none">
-                  <span className="w-5 h-1.5 bg-primary rounded-xs"></span>
-                  <span className="w-1.5 h-3.5 bg-primary rounded-xs"></span>
-                </div>
-                {/* Upper Right */}
-                <div className="absolute -top-1.5 -right-1.5 w-5 h-5 flex flex-col items-end justify-between pointer-events-none">
-                  <span className="w-5 h-1.5 bg-primary rounded-xs"></span>
-                  <span className="w-1.5 h-3.5 bg-primary rounded-xs"></span>
-                </div>
-                {/* Lower Left */}
-                <div className="absolute -bottom-1.5 -left-1.5 w-5 h-5 flex flex-col justify-between pointer-events-none">
-                  <span className="w-1.5 h-3.5 bg-primary rounded-xs"></span>
-                  <span className="w-5 h-1.5 bg-primary rounded-xs"></span>
-                </div>
-                {/* Lower Right */}
-                <div className="absolute -bottom-1.5 -right-1.5 w-5 h-5 flex flex-col items-end justify-between pointer-events-none">
-                  <span className="w-1.5 h-3.5 bg-primary rounded-xs"></span>
-                  <span className="w-5 h-1.5 bg-primary rounded-xs"></span>
-                </div>
-                {/* Micro Mid-Point Grip Notches */}
-                <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-4 bg-primary-container rounded-xs shadow-sm"></div>
-                <div className="absolute top-1/2 -right-1 -translate-y-1/2 w-2 h-4 bg-primary-container rounded-xs shadow-sm"></div>
-                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-4 h-2 bg-primary-container rounded-xs shadow-sm"></div>
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-2 bg-primary-container rounded-xs shadow-sm"></div>
-                {/* Live Crop Dimension Indicator Overlay on Box Edge */}
-                <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-surface-container-highest/95 backdrop-blur-md px-2 py-0.5 rounded text-on-surface shadow-md pointer-events-none flex items-center gap-1">
-                  <span className="w-1 h-1 rounded-full bg-primary"></span>
-                  <span className="font-label-caps text-label-caps text-primary tracking-widest uppercase">Ratio 1:1</span>
-                </div>
-              </div>
+              )}
+              <span
+                aria-label="Resize crop from top left"
+                className="dt-crop-handle dt-crop-handle--nw"
+                role="slider"
+                style={{ top: cropInset - 10, left: cropInset - 10 }}
+                draggable
+                onDragStart={onHandleDragStart('nw')}
+                onDrag={onHandleDrag}
+                onPointerDown={onHandlePointerDown('nw')}
+              />
+              <span
+                aria-label="Resize crop from top right"
+                className="dt-crop-handle dt-crop-handle--ne"
+                role="slider"
+                style={{ top: cropInset - 10, right: cropInset - 10 }}
+                draggable
+                onDragStart={onHandleDragStart('ne')}
+                onDrag={onHandleDrag}
+                onPointerDown={onHandlePointerDown('ne')}
+              />
+              <span
+                aria-label="Resize crop from bottom left"
+                className="dt-crop-handle dt-crop-handle--sw"
+                role="slider"
+                style={{ bottom: cropInset - 10, left: cropInset - 10 }}
+                draggable
+                onDragStart={onHandleDragStart('sw')}
+                onDrag={onHandleDrag}
+                onPointerDown={onHandlePointerDown('sw')}
+              />
+              <span
+                aria-label="Resize crop from bottom right"
+                className="dt-crop-handle dt-crop-handle--se"
+                role="slider"
+                style={{ bottom: cropInset - 10, right: cropInset - 10 }}
+                draggable
+                onDragStart={onHandleDragStart('se')}
+                onDrag={onHandleDrag}
+                onPointerDown={onHandlePointerDown('se')}
+              />
               {/* Tactile Drag Gesture Feedback Hint */}
               <div
                 className="absolute bottom-3 inset-x-0 mx-auto w-fit flex items-center gap-1.5 bg-surface-container-highest/80 backdrop-blur-md px-3 py-1 rounded-full shadow-lg pointer-events-none transition-opacity duration-300"
@@ -207,7 +385,7 @@ function Crop() {
             <div className="flex justify-between items-center">
               <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider">Alignment Yaw</span>
               <span className="font-spec-numeral text-body-sm text-primary" id="yawReadout">
-                0.0°
+                {yaw.toFixed(1)}°
               </span>
             </div>
             <div className="relative w-full h-8 flex items-center bg-surface-container-low rounded-lg px-3">
@@ -228,7 +406,8 @@ function Crop() {
                 min="-15"
                 step="0.5"
                 type="range"
-                defaultValue="0"
+                value={yaw}
+                onChange={(event) => setYaw(Number(event.target.value))}
               />
             </div>
           </div>
@@ -250,9 +429,10 @@ function Crop() {
                 className="flex-1 h-[52px] rounded-lg bg-primary text-on-primary hover:bg-primary-fixed-dim active:scale-[0.98] shadow-[0_4px_20px_rgba(197,168,128,0.25)] transition-all flex items-center justify-center gap-2 font-title-md text-title-md font-semibold tracking-wide"
                 id="confirmCropBtn"
                 type="button"
+                disabled={confirming}
                 onClick={handleConfirmCrop}
               >
-                <span className="">Use This Tile</span>
+                <span className="">{confirming ? 'Cropping…' : 'Use This Tile'}</span>
                 <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
               </button>
             </div>
