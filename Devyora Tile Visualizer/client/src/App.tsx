@@ -1,8 +1,8 @@
-import Home from './pages/Home'
+import Camera from './pages/Camera'
 import './App.css'
 
 function App() {
-  return <Home />
+  return <Camera />
 }
 
 export default App
