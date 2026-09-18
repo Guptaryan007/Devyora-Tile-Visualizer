@@ -1,8 +1,8 @@
-import Style from './pages/Style'
+import Summary from './pages/Summary'
 import './App.css'
 
 function App() {
-  return <Style />
+  return <Summary />
 }
 
 export default App
