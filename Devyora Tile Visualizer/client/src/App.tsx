@@ -1,8 +1,8 @@
-import Space from './pages/Space'
+import Style from './pages/Style'
 import './App.css'
 
 function App() {
-  return <Space />
+  return <Style />
 }
 
 export default App
