@@ -1,8 +1,8 @@
-import TileSize from './pages/TileSize'
+import Space from './pages/Space'
 import './App.css'
 
 function App() {
-  return <TileSize />
+  return <Space />
 }
 
 export default App
