@@ -1,8 +1,8 @@
-import Summary from './pages/Summary'
+import Loading from './pages/Loading'
 import './App.css'
 
 function App() {
-  return <Summary />
+  return <Loading />
 }
 
 export default App
