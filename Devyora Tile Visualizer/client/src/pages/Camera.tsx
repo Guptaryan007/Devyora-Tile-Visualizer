@@ -1,20 +1,148 @@
+import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useFlow } from '../state/FlowContext'
 import './Camera.css'
+
+const PLACEHOLDER_FEED =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuDO9Sw_P-OLg87i2fEL8bhqb8bY9LFOd8fpZLTLgsoNtXVRfm4NFxWPp5kgtuBAq_3oWjY-p9xi5--YUo1YRWwX8h9JbDuKMofZI84duIuJfsosmMt4mZEjXhis9pAeFbvoarHs3sctbv9E-YilGGMdjHJVn47bq9zisvF5og0lnYdS3vFJ9cVcicux8PaxpbdreYFD8zBNR3uQ_My1Ke46aBZ9BTwLWTm5VzOau3JhRtLoE-M0gHoRsQ'
+
+const CAMERA_UNAVAILABLE_MESSAGE =
+  "Camera isn't available in this browser. Try Upload from Gallery instead."
+const CAMERA_DENIED_MESSAGE =
+  "Camera access was denied or no camera was found. Try Upload from Gallery instead."
 
 function Camera() {
   const navigate = useNavigate()
+  const { setTileImage } = useFlow()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+  const [cameraActive, setCameraActive] = useState(false)
+  const [cameraBusy, setCameraBusy] = useState(false)
+  const [cameraError, setCameraError] = useState<string | null>(null)
+
+  const stopCamera = useCallback(() => {
+    streamRef.current?.getTracks().forEach((track) => track.stop())
+    streamRef.current = null
+    if (videoRef.current) {
+      videoRef.current.srcObject = null
+    }
+    setCameraActive(false)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      streamRef.current?.getTracks().forEach((track) => track.stop())
+      streamRef.current = null
+    }
+  }, [])
+
+  useEffect(() => {
+    const video = videoRef.current
+    const stream = streamRef.current
+    if (!cameraActive || !video || !stream) return
+    video.srcObject = stream
+    void video.play().catch(() => {
+      setCameraError(CAMERA_DENIED_MESSAGE)
+      stopCamera()
+    })
+  }, [cameraActive, stopCamera])
+
   const handleReturn = () => {
+    stopCamera()
     navigate('/')
   }
   const handlePreviousStep = () => {
+    stopCamera()
     navigate('/')
   }
   const handleToggleGrid = () => {}
-  const handleCapture = () => {
+
+  const startCamera = async () => {
+    setCameraError(null)
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setCameraError(CAMERA_UNAVAILABLE_MESSAGE)
+      return
+    }
+
+    setCameraBusy(true)
+    try {
+      let stream: MediaStream
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'environment' } },
+          audio: false,
+        })
+      } catch {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+      }
+      streamRef.current = stream
+      setCameraActive(true)
+    } catch {
+      setCameraError(CAMERA_DENIED_MESSAGE)
+      stopCamera()
+    } finally {
+      setCameraBusy(false)
+    }
+  }
+
+  const captureSnapshot = () => {
+    const video = videoRef.current
+    if (!video || video.videoWidth === 0 || video.videoHeight === 0) {
+      setCameraError('The camera preview is not ready yet. Please wait a moment, then try again.')
+      return
+    }
+
+    const canvas = document.createElement('canvas')
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    const context = canvas.getContext('2d')
+    if (!context) {
+      setCameraError(CAMERA_UNAVAILABLE_MESSAGE)
+      return
+    }
+
+    context.drawImage(video, 0, 0, canvas.width, canvas.height)
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.92)
+    setTileImage(dataUrl)
+    stopCamera()
     navigate('/crop')
   }
+
+  const handleCapture = () => {
+    if (cameraBusy) return
+    if (cameraActive) {
+      captureSnapshot()
+      return
+    }
+    void startCamera()
+  }
+
   const handleUploadFromGallery = () => {
-    navigate('/crop')
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      const result = reader.result
+      if (typeof result !== 'string') {
+        setCameraError('That image could not be read. Please try another file from your gallery.')
+        return
+      }
+      setCameraError(null)
+      stopCamera()
+      setTileImage(result)
+      navigate('/crop')
+    }
+    reader.onerror = () => {
+      setCameraError('That image could not be read. Please try another file from your gallery.')
+    }
+    reader.readAsDataURL(file)
   }
 
   return (
@@ -80,12 +208,23 @@ function Camera() {
           </div>
           <div className="px-margin w-full flex flex-col items-center">
             <div className="relative w-full aspect-square max-w-[420px] rounded-xl overflow-hidden bg-surface-container-lowest shadow-2xl flex items-center justify-center select-none">
-              <img
-                alt="Live tile capture preview"
-                className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none scale-105 transition-transform duration-700 ease-out"
-                id="viewfinderFeed"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDO9Sw_P-OLg87i2fEL8bhqb8bY9LFOd8fpZLTLgsoNtXVRfm4NFxWPp5kgtuBAq_3oWjY-p9xi5--YUo1YRWwX8h9JbDuKMofZI84duIuJfsosmMt4mZEjXhis9pAeFbvoarHs3sctbv9E-YilGGMdjHJVn47bq9zisvF5og0lnYdS3vFJ9cVcicux8PaxpbdreYFD8zBNR3uQ_My1Ke46aBZ9BTwLWTm5VzOau3JhRtLoE-M0gHoRsQ"
-              />
+              {cameraActive ? (
+                <video
+                  autoPlay
+                  className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
+                  id="viewfinderFeed"
+                  muted
+                  playsInline
+                  ref={videoRef}
+                />
+              ) : (
+                <img
+                  alt="Live tile capture preview"
+                  className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none scale-105 transition-transform duration-700 ease-out"
+                  id="viewfinderFeed"
+                  src={PLACEHOLDER_FEED}
+                />
+              )}
               <div className="absolute inset-0 bg-gradient-to-b from-surface-container-lowest/50 via-transparent to-surface-container-lowest/70 pointer-events-none"></div>
               <div
                 className="absolute inset-4 grid grid-cols-3 grid-rows-3 pointer-events-none opacity-40 transition-opacity duration-300"
@@ -162,8 +301,14 @@ function Camera() {
             </div>
           </div>
           <div className="px-margin pt-space-md pb-space-lg flex flex-col gap-space-sm w-full max-w-[420px] mx-auto">
+            {cameraError ? (
+              <p className="font-body-sm text-body-sm text-on-surface-variant text-center" role="alert">
+                {cameraError}
+              </p>
+            ) : null}
             <button
               className="w-full min-h-[56px] rounded-lg bg-primary hover:bg-primary-fixed-dim active:scale-[0.985] text-on-primary transition-all duration-150 flex items-center justify-center gap-2 shadow-[0_8px_20px_rgba(226,195,153,0.22)] focus:outline-none"
+              disabled={cameraBusy}
               id="captureBtn"
               type="button"
               onClick={handleCapture}
@@ -171,8 +316,19 @@ function Camera() {
               <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>
                 photo_camera
               </span>
-              <span className="font-title-md text-title-md tracking-wider uppercase">Take Photo</span>
+              <span className="font-title-md text-title-md tracking-wider uppercase">
+                {cameraActive ? 'Capture' : cameraBusy ? 'Starting camera' : 'Take Photo'}
+              </span>
             </button>
+            <input
+              accept="image/*"
+              aria-hidden="true"
+              hidden
+              onChange={handleFileChange}
+              ref={fileInputRef}
+              tabIndex={-1}
+              type="file"
+            />
             <button
               className="w-full min-h-[52px] rounded-lg bg-surface-container hover:bg-surface-container-high active:scale-[0.985] text-on-surface transition-all duration-150 flex items-center justify-center gap-2 shadow-sm focus:outline-none"
               type="button"
