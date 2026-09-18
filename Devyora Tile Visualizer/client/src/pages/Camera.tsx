@@ -8,7 +8,7 @@ function Camera() {
   const handleUploadFromGallery = () => {}
 
   return (
-    <div className="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen">
+    <div className="camera-page bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen">
       <header className="fixed top-0 inset-x-0 z-50 bg-surface/85 backdrop-blur-xl pt-safe shadow-[0_1px_12px_rgba(0,0,0,0.45)]">
         <div className="h-16 px-margin flex items-center justify-between">
           <div className="flex items-center gap-space-sm">
@@ -20,14 +20,9 @@ function Camera() {
             >
               <span className="material-symbols-outlined text-[20px]">arrow_back_ios_new</span>
             </button>
-            <div className="flex items-center gap-space-sm">
-              <img
-                alt="DEVYORA Architectural Logo"
-                className="h-8 w-auto object-contain"
-                src="https://lh3.googleusercontent.com/aida/AEtjO1WtFhkYkqGoBmQILH5fWGUR9_xP0LcxA_C7Hm6RM7Ngg4Yxs7gsBWyQvPg2r7QMyaBuBZVhM2RrlN7uKwz6JPvAqfs8ccTb_m-q2o-hzA5lIblHn7cyMpjQtoLV5iyqvVa2kTkgNck0KLGOEtA00-k9y88fkjUeT5-Im1ZUXNIobvVStBdpp1uvISBWQNsw4HUXHKDstoAHUYSsU6wBWNPU23xRnW80vGeofmhMRmaBUc1ECxC9ClFxId4"
-              />
-              <span className="font-label-caps text-label-caps uppercase text-primary tracking-widest">DEVYORA</span>
-            </div>
+            <span className="camera__logo" aria-label="DEVYORA">
+              DEVYORA
+            </span>
           </div>
           <div className="flex flex-col items-center">
             <span className="font-headline-sm text-headline-sm uppercase text-on-surface">Surface Selection</span>
