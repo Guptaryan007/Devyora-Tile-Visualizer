@@ -1,18 +1,32 @@
 import { useNavigate } from 'react-router-dom'
+import { useFlow } from '../state/FlowContext'
 import './TileSize.css'
 
 function TileSize() {
   const navigate = useNavigate()
+  const { tileSize, setTileSize } = useFlow()
   const handleReturn = () => {
     navigate('/crop')
   }
   const handleBack = () => {
     navigate('/crop')
   }
-  const handleSelectSize = () => {}
+  const handleSelectSize = (size: string) => {
+    setTileSize(size)
+  }
   const handleContinue = () => {
     navigate('/space')
   }
+  const sizeLabel =
+    tileSize === '600x600'
+      ? '600 × 600 mm'
+      : tileSize === '800x800'
+        ? '800 × 800 mm'
+        : tileSize === '1200x600'
+          ? '1200 × 600 mm'
+          : tileSize === '1200x1200'
+            ? '1200 × 1200 mm'
+            : null
 
   return (
     <div className="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen">
@@ -28,11 +42,6 @@ function TileSize() {
               <span className="material-symbols-outlined text-[20px]">arrow_back_ios_new</span>
             </button>
             <div className="flex items-center gap-space-sm">
-              <img
-                alt="DEVYORA Architectural Logo"
-                className="h-8 w-auto object-contain"
-                src="https://lh3.googleusercontent.com/aida/AEtjO1WtFhkYkqGoBmQILH5fWGUR9_xP0LcxA_C7Hm6RM7Ngg4Yxs7gsBWyQvPg2r7QMyaBuBZVhM2RrlN7uKwz6JPvAqfs8ccTb_m-q2o-hzA5lIblHn7cyMpjQtoLV5iyqvVa2kTkgNck0KLGOEtA00-k9y88fkjUeT5-Im1ZUXNIobvVStBdpp1uvISBWQNsw4HUXHKDstoAHUYSsU6wBWNPU23xRnW80vGeofmhMRmaBUc1ECxC9ClFxId4"
-              />
               <span className="font-label-caps text-label-caps uppercase text-primary tracking-widest">DEVYORA</span>
             </div>
           </div>
@@ -78,9 +87,9 @@ function TileSize() {
           <div className="px-margin flex flex-col gap-space-md" id="size-selector-group">
             {/* Option 1: 600 x 600 mm */}
             <div
-              className="tile-card cursor-pointer w-full bg-surface-container-low hover:bg-surface-container transition-all duration-200 p-space-md rounded-xl flex items-center justify-between relative shadow-sm"
+              className={`tile-card cursor-pointer w-full bg-surface-container-low hover:bg-surface-container transition-all duration-200 p-space-md rounded-xl flex items-center justify-between relative shadow-sm${tileSize === '600x600' ? ' selected' : ''}`}
               data-size="600x600"
-              onClick={handleSelectSize}
+              onClick={() => handleSelectSize('600x600')}
             >
               <div className="flex items-center gap-space-md min-w-0">
                 {/* Architectural Ratio Silhouette */}
@@ -108,9 +117,9 @@ function TileSize() {
             </div>
             {/* Option 2: 800 x 800 mm */}
             <div
-              className="tile-card cursor-pointer w-full bg-surface-container-low hover:bg-surface-container transition-all duration-200 p-space-md rounded-xl flex items-center justify-between relative shadow-sm"
+              className={`tile-card cursor-pointer w-full bg-surface-container-low hover:bg-surface-container transition-all duration-200 p-space-md rounded-xl flex items-center justify-between relative shadow-sm${tileSize === '800x800' ? ' selected' : ''}`}
               data-size="800x800"
-              onClick={handleSelectSize}
+              onClick={() => handleSelectSize('800x800')}
             >
               <div className="flex items-center gap-space-md min-w-0">
                 {/* Architectural Ratio Silhouette */}
@@ -138,33 +147,28 @@ function TileSize() {
             </div>
             {/* Option 3: 1200 x 600 mm (Pre-Selected) */}
             <div
-              className="tile-card is-selected cursor-pointer w-full bg-surface-container-high transition-all duration-200 p-space-md rounded-xl flex items-center justify-between relative shadow-md"
+              className={`tile-card cursor-pointer w-full bg-surface-container-low hover:bg-surface-container transition-all duration-200 p-space-md rounded-xl flex items-center justify-between relative shadow-sm${tileSize === '1200x600' ? ' selected' : ''}`}
               data-size="1200x600"
-              onClick={handleSelectSize}
+              onClick={() => handleSelectSize('1200x600')}
             >
               <div className="flex items-center gap-space-md min-w-0">
                 {/* Architectural Ratio Silhouette (2:1 Rectangle) */}
-                <div className="w-12 h-12 rounded-lg bg-primary-container/20 flex items-center justify-center flex-shrink-0 text-primary">
-                  <div className="w-9 h-5 rounded-[2px] bg-primary flex items-center justify-center">
-                    <span className="font-label-caps text-[8px] text-on-primary select-none font-semibold">2:1</span>
+                <div className="w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center flex-shrink-0 text-outline">
+                  <div className="w-9 h-5 rounded-[2px] bg-outline-variant/60 flex items-center justify-center">
+                    <span className="font-label-caps text-[8px] text-outline select-none">2:1</span>
                   </div>
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <div className="flex items-center gap-space-xs">
-                    <span className="font-spec-numeral text-spec-numeral text-primary tracking-wide font-medium">
-                      1200 × 600 mm
-                    </span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"></span>
-                  </div>
-                  <span className="font-label-caps text-label-caps text-primary uppercase tracking-wider mt-0.5">
+                  <span className="font-spec-numeral text-spec-numeral text-on-surface tracking-wide">1200 × 600 mm</span>
+                  <span className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider mt-0.5">
                     Large Rectangular Slab
                   </span>
                 </div>
               </div>
-              {/* Radio Indicator (Active) */}
-              <div className="radio-pill w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 shadow-[0_0_12px_rgba(197,168,128,0.35)]">
+              {/* Radio Indicator */}
+              <div className="radio-pill w-6 h-6 rounded-full bg-surface-container-highest flex items-center justify-center flex-shrink-0">
                 <span
-                  className="check-icon material-symbols-outlined text-[16px] text-on-primary"
+                  className="check-icon material-symbols-outlined text-[16px] text-on-primary hidden"
                   style={{ fontVariationSettings: "'FILL' 1" }}
                 >
                   check
@@ -173,9 +177,9 @@ function TileSize() {
             </div>
             {/* Option 4: 1200 x 1200 mm */}
             <div
-              className="tile-card cursor-pointer w-full bg-surface-container-low hover:bg-surface-container transition-all duration-200 p-space-md rounded-xl flex items-center justify-between relative shadow-sm"
+              className={`tile-card cursor-pointer w-full bg-surface-container-low hover:bg-surface-container transition-all duration-200 p-space-md rounded-xl flex items-center justify-between relative shadow-sm${tileSize === '1200x1200' ? ' selected' : ''}`}
               data-size="1200x1200"
-              onClick={handleSelectSize}
+              onClick={() => handleSelectSize('1200x1200')}
             >
               <div className="flex items-center gap-space-md min-w-0">
                 {/* Architectural Ratio Silhouette */}
@@ -213,7 +217,7 @@ function TileSize() {
                   className="font-label-caps text-label-caps text-primary tracking-widest uppercase"
                   id="active-size-label"
                 >
-                  1200 × 600 mm Selected
+                  {sizeLabel ? `${sizeLabel} Selected` : 'Select a size'}
                 </span>
               </div>
               {/* Tactile Architectural Visualizer Preview */}

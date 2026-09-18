@@ -1,12 +1,16 @@
 import { useNavigate } from 'react-router-dom'
+import { useFlow } from '../state/FlowContext'
 import './Space.css'
 
 function Space() {
   const navigate = useNavigate()
+  const { space, setSpace } = useFlow()
   const handleReturn = () => {
     navigate('/tile-size')
   }
-  const handleSelectSpace = () => {}
+  const handleSelectSpace = (value: string) => {
+    setSpace(value)
+  }
   const handleContinue = () => {
     navigate('/style')
   }
@@ -25,11 +29,6 @@ function Space() {
               <span className="material-symbols-outlined text-[20px]">arrow_back_ios_new</span>
             </button>
             <div className="flex items-center gap-space-sm">
-              <img
-                alt="DEVYORA Architectural Logo"
-                className="h-8 w-auto object-contain"
-                src="https://lh3.googleusercontent.com/aida/AEtjO1WtFhkYkqGoBmQILH5fWGUR9_xP0LcxA_C7Hm6RM7Ngg4Yxs7gsBWyQvPg2r7QMyaBuBZVhM2RrlN7uKwz6JPvAqfs8ccTb_m-q2o-hzA5lIblHn7cyMpjQtoLV5iyqvVa2kTkgNck0KLGOEtA00-k9y88fkjUeT5-Im1ZUXNIobvVStBdpp1uvISBWQNsw4HUXHKDstoAHUYSsU6wBWNPU23xRnW80vGeofmhMRmaBUc1ECxC9ClFxId4"
-              />
               <span className="font-label-caps text-label-caps uppercase text-primary tracking-widest">DEVYORA</span>
             </div>
           </div>
@@ -67,8 +66,8 @@ function Space() {
           </div>
           <div className="px-margin grid grid-cols-2 gap-space-sm pb-32" id="spaceSelectorGrid">
             <div
-              className="space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]"
-              onClick={handleSelectSpace}
+              className={`space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]${space === 'Bathroom' ? ' selected' : ''}`}
+              onClick={() => handleSelectSpace('Bathroom')}
             >
               <div className="relative w-full aspect-[4/3] overflow-hidden bg-surface-container-lowest">
                 <img
@@ -77,7 +76,7 @@ function Space() {
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP5oA3AvnTsObA-oOr4trg44RxFMMyW1m2E5Wj_q9lD8zAQpMucUrLBk1i1LS3-0QMe5H1M9vIcaNV7UZer4PYV8q16dhpMVMIWdKyqidxgMR1C40tcJKfupQba_dFnRvQyL9_ZbtHz2N5OfsvGA__l8k4ov_w-LRcpxFLSl06yQWvUZ1yQZy9E1HM8OdDMZC1QbbLRXfpckIN3-C89gipLFBzNYdi0iCqSJYptKIrO6cqG7S7utJooQ"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/90 via-surface-container-lowest/20 to-transparent"></div>
-                <div className="selection-badge absolute top-2 right-2 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-lg transition-transform duration-200">
+                <div className="selection-badge hidden absolute top-2 right-2 w-6 h-6 rounded-full bg-primary items-center justify-center shadow-lg transition-transform duration-200">
                   <span
                     className="material-symbols-outlined text-on-primary text-[16px] font-bold"
                     style={{ fontVariationSettings: "'FILL' 1" }}
@@ -86,15 +85,15 @@ function Space() {
                   </span>
                 </div>
               </div>
-              <div className="selection-indicator absolute inset-0 rounded-xl pointer-events-none bg-primary/10 shadow-[inset_0_0_0_2px_#e2c399]"></div>
+              <div className="selection-indicator hidden absolute inset-0 rounded-xl pointer-events-none bg-primary/10 shadow-[inset_0_0_0_2px_#e2c399]"></div>
               <div className="p-space-sm bg-surface-container-high flex items-center justify-between">
                 <span className="font-headline-sm text-headline-sm text-on-surface tracking-wide">Bathroom</span>
-                <span className="selection-dot w-2 h-2 rounded-full bg-primary"></span>
+                <span className="selection-dot hidden w-2 h-2 rounded-full bg-primary"></span>
               </div>
             </div>
             <div
-              className="space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]"
-              onClick={handleSelectSpace}
+              className={`space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]${space === 'Living Room' ? ' selected' : ''}`}
+              onClick={() => handleSelectSpace('Living Room')}
             >
               <div className="relative w-full aspect-[4/3] overflow-hidden bg-surface-container-lowest">
                 <img
@@ -119,8 +118,8 @@ function Space() {
               </div>
             </div>
             <div
-              className="space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]"
-              onClick={handleSelectSpace}
+              className={`space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]${space === 'Kitchen' ? ' selected' : ''}`}
+              onClick={() => handleSelectSpace('Kitchen')}
             >
               <div className="relative w-full aspect-[4/3] overflow-hidden bg-surface-container-lowest">
                 <img
@@ -145,8 +144,8 @@ function Space() {
               </div>
             </div>
             <div
-              className="space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]"
-              onClick={handleSelectSpace}
+              className={`space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]${space === 'Terrace' ? ' selected' : ''}`}
+              onClick={() => handleSelectSpace('Terrace')}
             >
               <div className="relative w-full aspect-[4/3] overflow-hidden bg-surface-container-lowest">
                 <img
@@ -171,8 +170,8 @@ function Space() {
               </div>
             </div>
             <div
-              className="space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]"
-              onClick={handleSelectSpace}
+              className={`space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]${space === 'Bedroom' ? ' selected' : ''}`}
+              onClick={() => handleSelectSpace('Bedroom')}
             >
               <div className="relative w-full aspect-[4/3] overflow-hidden bg-surface-container-lowest">
                 <img
@@ -197,8 +196,8 @@ function Space() {
               </div>
             </div>
             <div
-              className="space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]"
-              onClick={handleSelectSpace}
+              className={`space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]${space === 'Balcony' ? ' selected' : ''}`}
+              onClick={() => handleSelectSpace('Balcony')}
             >
               <div className="relative w-full aspect-[4/3] overflow-hidden bg-surface-container-lowest">
                 <img
@@ -223,8 +222,8 @@ function Space() {
               </div>
             </div>
             <div
-              className="space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]"
-              onClick={handleSelectSpace}
+              className={`space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]${space === 'Parking' ? ' selected' : ''}`}
+              onClick={() => handleSelectSpace('Parking')}
             >
               <div className="relative w-full aspect-[4/3] overflow-hidden bg-surface-container-lowest">
                 <img
@@ -249,8 +248,8 @@ function Space() {
               </div>
             </div>
             <div
-              className="space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]"
-              onClick={handleSelectSpace}
+              className={`space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]${space === 'Staircase' ? ' selected' : ''}`}
+              onClick={() => handleSelectSpace('Staircase')}
             >
               <div className="relative w-full aspect-[4/3] overflow-hidden bg-surface-container-lowest">
                 <img
@@ -275,8 +274,8 @@ function Space() {
               </div>
             </div>
             <div
-              className="space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]"
-              onClick={handleSelectSpace}
+              className={`space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]${space === 'Entrance' ? ' selected' : ''}`}
+              onClick={() => handleSelectSpace('Entrance')}
             >
               <div className="relative w-full aspect-[4/3] overflow-hidden bg-surface-container-lowest">
                 <img
@@ -301,8 +300,8 @@ function Space() {
               </div>
             </div>
             <div
-              className="space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]"
-              onClick={handleSelectSpace}
+              className={`space-card relative flex flex-col rounded-xl overflow-hidden bg-surface-container-high cursor-pointer shadow-md transition-all duration-300 transform active:scale-[0.98]${space === 'Facade' ? ' selected' : ''}`}
+              onClick={() => handleSelectSpace('Facade')}
             >
               <div className="relative w-full aspect-[4/3] overflow-hidden bg-surface-container-lowest">
                 <img
@@ -332,7 +331,7 @@ function Space() {
               <div className="flex items-center justify-between px-space-xs pb-space-xs text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider">
                 <span>Selected Canvas</span>
                 <span className="text-primary font-body-md font-semibold" id="activeSpaceLabel">
-                  Bathroom
+                  {space ?? 'None'}
                 </span>
               </div>
               <button

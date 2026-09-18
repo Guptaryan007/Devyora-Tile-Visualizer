@@ -222,6 +222,22 @@ p {
 .active\:scale-\[0\.98\]:active { transform: scale(0.98); }
 .active\:scale-\[0\.99\]:active { transform: scale(0.99); }
 
+.space-card.selected {
+  box-shadow: 0 0 0 2px #e2c399, 0 4px 18px rgba(197, 168, 128, 0.28);
+}
+
+.space-card.selected .selection-badge {
+  display: flex;
+}
+
+.space-card.selected .selection-indicator {
+  display: block;
+}
+
+.space-card.selected .selection-dot {
+  display: block;
+}
+
 @keyframes pulse {
   50% { opacity: 0.5; }
 }

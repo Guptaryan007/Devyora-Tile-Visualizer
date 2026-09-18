@@ -222,6 +222,24 @@ p {
 .hover\:bg-surface-container:hover { background-color: #1f2021; }
 .active\:scale-\[0\.99\]:active { transform: scale(0.99); }
 
+.tile-card.selected {
+  background-color: #292a2b;
+  box-shadow: 0 0 0 2px #e2c399, 0 0 16px rgba(197, 168, 128, 0.28);
+}
+
+.tile-card.selected .radio-pill {
+  background-color: #e2c399;
+  box-shadow: 0 0 12px rgba(197, 168, 128, 0.35);
+}
+
+.tile-card.selected .check-icon {
+  display: block;
+}
+
+.tile-card.selected .font-spec-numeral {
+  color: #e2c399;
+}
+
 @keyframes pulse {
   50% { opacity: 0.5; }
 }

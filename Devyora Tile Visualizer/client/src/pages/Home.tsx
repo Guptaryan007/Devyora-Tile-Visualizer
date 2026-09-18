@@ -1,9 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import './Home.css'
 
-const LOGO_SRC =
-  'https://lh3.googleusercontent.com/aida/AEtjO1WtFhkYkqGoBmQILH5fWGUR9_xP0LcxA_C7Hm6RM7Ngg4Yxs7gsBWyQvPg2r7QMyaBuBZVhM2RrlN7uKwz6JPvAqfs8ccTb_m-q2o-hzA5lIblHn7cyMpjQtoLV5iyqvVa2kTkgNck0KLGOEtA00-k9y88fkjUeT5-Im1ZUXNIobvVStBdpp1uvISBWQNsw4HUXHKDstoAHUYSsU6wBWNPU23xRnW80vGeofmhMRmaBUc1ECxC9ClFxId4'
-
 const TILE_SRC =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuDO9Sw_P-OLg87i2fEL8bhqb8bY9LFOd8fpZLTLgsoNtXVRfm4NFxWPp5kgtuBAq_3oWjY-p9xi5--YUo1YRWwX8h9JbDuKMofZI84duIuJfsosmMt4mZEjXhis9pAeFbvoarHs3sctbv9E-YilGGMdjHJVn47bq9zisvF5og0lnYdS3vFJ9cVcicux8PaxpbdreYFD8zBNR3uQ_My1Ke46aBZ9BTwLWTm5VzOau3JhRtLoE-M0gHoRsQ'
 
@@ -19,11 +16,9 @@ function Home() {
       <div className="home__frame">
         <header className="home__header">
           <div className="home__brand">
-            <img
-              alt="DEVYORA Architectural Logo"
-              className="home__logo"
-              src={LOGO_SRC}
-            />
+            <span className="home__logo" aria-label="DEVYORA">
+              DEVYORA
+            </span>
           </div>
           <div className="home__header-actions">
             <button

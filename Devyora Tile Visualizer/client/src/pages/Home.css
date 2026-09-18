@@ -71,9 +71,13 @@
 }
 
 .home__logo {
-  height: 1.5rem;
-  width: auto;
-  object-fit: contain;
+  font-family: var(--home-font-heading);
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.14em;
+  font-weight: 400;
+  color: var(--color-primary);
+  text-transform: uppercase;
 }
 
 .home__theme-toggle {

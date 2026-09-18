@@ -238,6 +238,24 @@ p {
 .hover\:text-primary:hover { color: #e2c399; }
 .active\:scale-\[0\.99\]:active { transform: scale(0.99); }
 
+.style-card.selected {
+  background-color: #292a2b;
+  box-shadow: 0 0 0 2px #e2c399, 0 0 16px rgba(197, 168, 128, 0.28);
+}
+
+.style-card.selected .style-indicator {
+  opacity: 1;
+  background-color: #e2c399;
+}
+
+.style-card.selected .style-indicator .material-symbols-outlined {
+  color: #402d0f;
+}
+
+.style-card.selected .style-title {
+  color: #e2c399;
+}
+
 header .h-16 {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;

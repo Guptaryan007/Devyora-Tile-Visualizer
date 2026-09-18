@@ -1,12 +1,28 @@
 import { useNavigate } from 'react-router-dom'
+import { useFlow } from '../state/FlowContext'
 import './Style.css'
+
+const STYLE_LABELS: Record<string, string> = {
+  minimal: 'Minimal',
+  modern: 'Modern',
+  luxury: 'Luxury',
+  warm: 'Warm',
+  contemporary: 'Contemporary',
+  earthy: 'Earthy',
+  indian: 'Indian',
+  elegant: 'Elegant',
+  surprise: 'Surprise Me',
+}
 
 function Style() {
   const navigate = useNavigate()
+  const { style, setStyle } = useFlow()
   const handleReturn = () => {
     navigate('/space')
   }
-  const handleSelectStyle = () => {}
+  const handleSelectStyle = (value: string) => {
+    setStyle(value)
+  }
   const handleReview = () => {
     navigate('/summary')
   }
@@ -25,11 +41,6 @@ function Style() {
               <span className="material-symbols-outlined text-[20px]">arrow_back_ios_new</span>
             </button>
             <div className="flex items-center gap-space-sm">
-              <img
-                alt="DEVYORA Architectural Logo"
-                className="h-8 w-auto object-contain"
-                src="https://lh3.googleusercontent.com/aida/AEtjO1WtFhkYkqGoBmQILH5fWGUR9_xP0LcxA_C7Hm6RM7Ngg4Yxs7gsBWyQvPg2r7QMyaBuBZVhM2RrlN7uKwz6JPvAqfs8ccTb_m-q2o-hzA5lIblHn7cyMpjQtoLV5iyqvVa2kTkgNck0KLGOEtA00-k9y88fkjUeT5-Im1ZUXNIobvVStBdpp1uvISBWQNsw4HUXHKDstoAHUYSsU6wBWNPU23xRnW80vGeofmhMRmaBUc1ECxC9ClFxId4"
-              />
               <span className="font-label-caps text-label-caps uppercase text-primary tracking-widest">DEVYORA</span>
             </div>
           </div>
@@ -66,15 +77,15 @@ function Style() {
           <div aria-label="Interior Design Styles" className="grid grid-cols-2 gap-space-sm" id="style-grid" role="radiogroup">
             {/* 1. Minimal (Default Selected) */}
             <div
-              aria-checked="true"
-              className="style-card relative flex flex-col p-space-sm rounded-xl cursor-pointer transition-all duration-200 bg-surface-container-high shadow-md overflow-hidden"
+              aria-checked={style === 'minimal'}
+              className={`style-card relative flex flex-col p-space-sm rounded-xl cursor-pointer transition-all duration-200 bg-surface-container shadow-sm overflow-hidden${style === 'minimal' ? ' selected' : ''}`}
               data-style="minimal"
-              onClick={handleSelectStyle}
+              onClick={() => handleSelectStyle('minimal')}
               role="radio"
               tabIndex={0}
             >
-              <div className="style-indicator absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow-sm">
-                <span className="material-symbols-outlined text-[14px] text-on-primary font-bold">check</span>
+              <div className="style-indicator absolute top-2 right-2 w-5 h-5 rounded-full bg-surface-container-highest flex items-center justify-center opacity-0 transition-opacity">
+                <span className="material-symbols-outlined text-[14px] text-on-surface font-bold">check</span>
               </div>
               <div className="w-full h-24 rounded-lg overflow-hidden mb-space-sm relative bg-surface-container-lowest">
                 <img
@@ -84,16 +95,16 @@ function Style() {
                 />
               </div>
               <div className="flex flex-col">
-                <span className="style-title font-headline-sm text-headline-sm uppercase text-primary">Minimal</span>
+                <span className="style-title font-headline-sm text-headline-sm uppercase text-on-surface">Minimal</span>
                 <span className="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Monolithic silence & stone</span>
               </div>
             </div>
             {/* 2. Modern */}
             <div
-              aria-checked="false"
-              className="style-card relative flex flex-col p-space-sm rounded-xl cursor-pointer transition-all duration-200 bg-surface-container shadow-sm overflow-hidden"
+              aria-checked={style === 'modern'}
+              className={`style-card relative flex flex-col p-space-sm rounded-xl cursor-pointer transition-all duration-200 bg-surface-container shadow-sm overflow-hidden${style === 'modern' ? ' selected' : ''}`}
               data-style="modern"
-              onClick={handleSelectStyle}
+              onClick={() => handleSelectStyle('modern')}
               role="radio"
               tabIndex={0}
             >
@@ -114,10 +125,10 @@ function Style() {
             </div>
             {/* 3. Luxury */}
             <div
-              aria-checked="false"
-              className="style-card relative flex flex-col p-space-sm rounded-xl cursor-pointer transition-all duration-200 bg-surface-container shadow-sm overflow-hidden"
+              aria-checked={style === 'luxury'}
+              className={`style-card relative flex flex-col p-space-sm rounded-xl cursor-pointer transition-all duration-200 bg-surface-container shadow-sm overflow-hidden${style === 'luxury' ? ' selected' : ''}`}
               data-style="luxury"
-              onClick={handleSelectStyle}
+              onClick={() => handleSelectStyle('luxury')}
               role="radio"
               tabIndex={0}
             >
@@ -138,10 +149,10 @@ function Style() {
             </div>
             {/* 4. Warm */}
             <div
-              aria-checked="false"
-              className="style-card relative flex flex-col p-space-sm rounded-xl cursor-pointer transition-all duration-200 bg-surface-container shadow-sm overflow-hidden"
+              aria-checked={style === 'warm'}
+              className={`style-card relative flex flex-col p-space-sm rounded-xl cursor-pointer transition-all duration-200 bg-surface-container shadow-sm overflow-hidden${style === 'warm' ? ' selected' : ''}`}
               data-style="warm"
-              onClick={handleSelectStyle}
+              onClick={() => handleSelectStyle('warm')}
               role="radio"
               tabIndex={0}
             >
@@ -162,10 +173,10 @@ function Style() {
             </div>
             {/* 5. Contemporary */}
             <div
-              aria-checked="false"
-              className="style-card relative flex flex-col p-space-sm rounded-xl cursor-pointer transition-all duration-200 bg-surface-container shadow-sm overflow-hidden"
+              aria-checked={style === 'contemporary'}
+              className={`style-card relative flex flex-col p-space-sm rounded-xl cursor-pointer transition-all duration-200 bg-surface-container shadow-sm overflow-hidden${style === 'contemporary' ? ' selected' : ''}`}
               data-style="contemporary"
-              onClick={handleSelectStyle}
+              onClick={() => handleSelectStyle('contemporary')}
               role="radio"
               tabIndex={0}
             >
@@ -186,10 +197,10 @@ function Style() {
             </div>
             {/* 6. Earthy */}
             <div
-              aria-checked="false"
-              className="style-card relative flex flex-col p-space-sm rounded-xl cursor-pointer transition-all duration-200 bg-surface-container shadow-sm overflow-hidden"
+              aria-checked={style === 'earthy'}
+              className={`style-card relative flex flex-col p-space-sm rounded-xl cursor-pointer transition-all duration-200 bg-surface-container shadow-sm overflow-hidden${style === 'earthy' ? ' selected' : ''}`}
               data-style="earthy"
-              onClick={handleSelectStyle}
+              onClick={() => handleSelectStyle('earthy')}
               role="radio"
               tabIndex={0}
             >
@@ -210,10 +221,10 @@ function Style() {
             </div>
             {/* 7. Indian */}
             <div
-              aria-checked="false"
-              className="style-card relative flex flex-col p-space-sm rounded-xl cursor-pointer transition-all duration-200 bg-surface-container shadow-sm overflow-hidden"
+              aria-checked={style === 'indian'}
+              className={`style-card relative flex flex-col p-space-sm rounded-xl cursor-pointer transition-all duration-200 bg-surface-container shadow-sm overflow-hidden${style === 'indian' ? ' selected' : ''}`}
               data-style="indian"
-              onClick={handleSelectStyle}
+              onClick={() => handleSelectStyle('indian')}
               role="radio"
               tabIndex={0}
             >
@@ -234,10 +245,10 @@ function Style() {
             </div>
             {/* 8. Elegant */}
             <div
-              aria-checked="false"
-              className="style-card relative flex flex-col p-space-sm rounded-xl cursor-pointer transition-all duration-200 bg-surface-container shadow-sm overflow-hidden"
+              aria-checked={style === 'elegant'}
+              className={`style-card relative flex flex-col p-space-sm rounded-xl cursor-pointer transition-all duration-200 bg-surface-container shadow-sm overflow-hidden${style === 'elegant' ? ' selected' : ''}`}
               data-style="elegant"
-              onClick={handleSelectStyle}
+              onClick={() => handleSelectStyle('elegant')}
               role="radio"
               tabIndex={0}
             >
@@ -260,10 +271,10 @@ function Style() {
           {/* 9. Surprise Me Feature Pill */}
           <div className="mt-space-sm w-full">
             <div
-              aria-checked="false"
-              className="style-card relative flex items-center justify-between p-space-md rounded-xl cursor-pointer transition-all duration-200 bg-surface-container shadow-sm"
+              aria-checked={style === 'surprise'}
+              className={`style-card relative flex items-center justify-between p-space-md rounded-xl cursor-pointer transition-all duration-200 bg-surface-container shadow-sm${style === 'surprise' ? ' selected' : ''}`}
               data-style="surprise"
-              onClick={handleSelectStyle}
+              onClick={() => handleSelectStyle('surprise')}
               role="radio"
               tabIndex={0}
             >
@@ -287,7 +298,9 @@ function Style() {
               <span className="material-symbols-outlined text-outline text-[20px]">layers</span>
               <div className="flex flex-col">
                 <span className="font-label-caps text-label-caps uppercase text-outline">Selected Atmosphere</span>
-                <span className="font-title-md text-title-md text-primary tracking-wide" id="active-style-label">Minimal</span>
+                <span className="font-title-md text-title-md text-primary tracking-wide" id="active-style-label">
+                  {style ? STYLE_LABELS[style] ?? style : 'None'}
+                </span>
               </div>
             </div>
             <div className="flex items-center gap-space-xs text-on-surface-variant">
