@@ -1,8 +1,8 @@
-import Loading from './pages/Loading'
+import Results from './pages/Results'
 import './App.css'
 
 function App() {
-  return <Loading />
+  return <Results />
 }
 
 export default App
