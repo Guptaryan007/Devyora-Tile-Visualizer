@@ -1,8 +1,8 @@
-import Camera from './pages/Camera'
+import Crop from './pages/Crop'
 import './App.css'
 
 function App() {
-  return <Camera />
+  return <Crop />
 }
 
 export default App
