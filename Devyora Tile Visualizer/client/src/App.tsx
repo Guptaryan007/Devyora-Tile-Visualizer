@@ -1,8 +1,8 @@
-import Crop from './pages/Crop'
+import TileSize from './pages/TileSize'
 import './App.css'
 
 function App() {
-  return <Crop />
+  return <TileSize />
 }
 
 export default App
